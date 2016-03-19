@@ -1,0 +1,6 @@
+cmake_minimum_required (VERSION 2.6)
+project (3exerc)
+add_subdirectory (graph) 
+add_executable(3exerc.exe main.c)
+target_link_libraries (3exerc.exe LINK_PUBLIC lgraph)
+target_link_libraries (3exerc.exe LINK_PUBLIC magraph)

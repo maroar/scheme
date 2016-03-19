@@ -1,1 +1,9 @@
 *.exe
+*.a
+3exerc/CMakeFiles/
+3exerc/CMakeCache.txt
+3exerc/Makefile
+3exerc/cmake_install.cmake
+3exerc/graph/CMakeFiles/
+3exerc/graph/Makefile
+3exerc/graph/cmake_install.cmake
