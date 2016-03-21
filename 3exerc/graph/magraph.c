@@ -18,7 +18,7 @@ magraph_ create_magraph(int n)
 void destroy_magraph(magraph_ graph)
 {
   int i;
-  for(i = 0; i < graph->n; i++)
+  for (i = 0; i < graph->n; i++)
     free(graph->node[i]);
   free (graph->node);
   free(graph);

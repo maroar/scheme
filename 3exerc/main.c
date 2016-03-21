@@ -18,10 +18,11 @@ int main()
     }
   }
 
-  //print_magraph(magraph);
-  //lgraph = 
+  lgraph = create_lgraph_by_magraph(magraph); 
+  print_lgraph(lgraph);
 
   destroy_magraph(magraph);
+  destroy_lgraph(lgraph);
 
   return 0;
 }

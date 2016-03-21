@@ -3,7 +3,6 @@
 #define LGRAPH
 #include "magraph.h"
 // node definition
-int lgraph_node_count = 0;
 
 typedef struct l_node* pl_node;
 struct l_node 
@@ -25,6 +24,7 @@ struct struct_lgraph
 
 lgraph_ create_lgraph(int n);
 lgraph_ create_lgraph_by_magraph();
-void destroy_lgraph();
-void print_lgraph();
+void add_lgraph_edge(lgraph_ graph, int i, int j);
+void destroy_lgraph(lgraph_ graph);
+void print_lgraph(lgraph_ graph);
 #endif
