@@ -1,3 +1,7 @@
+a.out
+*.o
+*.exe
+*~
 *.exe
 *.a
 3exerc/CMakeFiles/
