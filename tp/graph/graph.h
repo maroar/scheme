@@ -2,18 +2,48 @@
 #define MYGRAPH
 
 #include <list>
-
 struct  Node; 
 typedef Node* pNode;
-
+struct Edge;
+typedef Edge* pEdge;
+struct  Graph; 
+typedef Graph* pGraph;
+// Node
 struct Node {
   int id;
-  std::list<pNode> adj;
+  std::list<pEdge> adj;
 
-  Node(int id_) : id(id_) {}; 
-  void add_node(pNode v);
+  Node(int id_) : id(id_) {};
+  void add_edge(pNode v);
+  void add_edge(pNode v, int w);
   void print();
   void print_id();
 };
+// Edge
+struct Edge {
+  int weight;
+  pNode u, v;
 
+  Edge(pNode u_, pNode v_) : u(u_), v(v_), weight(0) {};
+  Edge(pNode u_, pNode v_, int w) : u(u_), v(v_), weight(w) {};
+  bool operator<(const Edge& r);
+  void print();
+};
+// Graph
+struct Graph {
+  int n, m;
+  pNode *V;
+  std::list<pEdge> E;
+
+  Graph(int n_);
+  Graph(int n_, int m_);
+  ~Graph(void);
+  pNode operator[](int i);
+  void  add_edge(int u, int v);
+  void  add_edge(int u, int v, int w);
+  void  add_edge_(int u, int v);
+  void  add_edge_(int u, int v, int w);
+  void  print();
+  void  sort_edges();
+};
 #endif
