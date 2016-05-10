@@ -1,2 +1,2 @@
 # scheme
-repository do tg (graph teory)
+repository to tg (graph teory)
