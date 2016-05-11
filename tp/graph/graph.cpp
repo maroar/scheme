@@ -47,11 +47,11 @@ pNode create_node(int id)
   return v;
 }
 
-pNode* create_nodes(int n)
+pNode* create_nodes(int n_)
 {
   int i;
-  pNode* V = (pNode*) malloc(n * sizeof(pNode));
-  for (i = 0; i < n; i++) {
+  pNode* V = (pNode*) malloc(n_ * sizeof(pNode));
+  for (i = 0; i < n_; i++) {
     V[i] = create_node(i);
   }
 
@@ -63,21 +63,21 @@ void free_node(pNode v)
   delete v;
 }
 
-void free_nodes(pNode* V, int n)
+void free_nodes(pNode* V, int n_)
 {
   int i;
-  for (i = 0; i <= n; i++) {
+  for (i = 0; i <= n_; i++) {
     delete V[i];
   }
   free(V);
 }
 
-void print_nodes(pNode* V, int n)
+void print_nodes(pNode* V, int n_)
 {
   int i;
 
   cout << "Nodes:" << endl; 
-  for (i = 1; i < n; i++) {
+  for (i = 1; i <= n_; i++) {
     cout << "<";
     V[i]->print();
     cout << ">" << endl;
@@ -101,13 +101,36 @@ void Edge::print()
   cout << u->id << " - " << v->id << "(" << weight << ")" << endl;
 }
 // Graph
-Graph::Graph(int n_) : n(n_)
+Graph::Graph(int n_) : kedge(undirected)
 {
+  n = n_;
+  kedge = undirected;
   V = create_nodes(n+1);
 }
 
-Graph::Graph(int n_, int m_) : n(n_), m(m_) 
+Graph::Graph(int n_, int m_) : kedge(undirected)
 {
+  n = n_;
+  m = m_;
+  V = create_nodes(n+1);
+}
+
+Graph::Graph(int n_, int m_, kEdge kedge_) : kedge(kedge_)
+{
+  n = n_;
+  m = m_;
+  V = create_nodes(n+1);
+}
+
+Graph::Graph(void) : kedge(undirected)
+{
+  read_graph_size();
+  V = create_nodes(n+1);
+}
+
+Graph::Graph(kEdge kedge_) : kedge(kedge_)
+{
+  read_graph_size();
   V = create_nodes(n+1);
 }
 
@@ -152,7 +175,15 @@ void Graph::add_edge_(int u, int v, int w)
 
 void Graph::print()
 {
-  print_nodes(V, n+1);
+  print_nodes(V, n);
+}
+
+void Graph::read_edges()
+{
+  if(kedge == directed)
+    read_directed_edges();
+  else
+    read_undirected_edges();
 }
 
 void Graph::sort_edges() 
@@ -160,3 +191,30 @@ void Graph::sort_edges()
   E.sort(PComp<Edge>);
 }
 
+void Graph::read_graph_size()
+{
+  cin >> n;
+  cin >> m;
+}
+
+void Graph::read_undirected_edges()
+{
+  int u, v, w;
+  for (int i = 1; i <= m; i++) {
+    cin >> u;
+    cin >> v;
+    cin >> w;
+    add_edge(u, v, w);
+  }
+}
+
+void Graph::read_directed_edges()
+{
+  int u, v, w;
+  for (int i = 1; i <= m; i++) {
+    cin >> u;
+    cin >> v;
+    cin >> w;
+    add_edge_(u, v, w);
+  }
+}

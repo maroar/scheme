@@ -21,6 +21,7 @@ struct Node {
   void print_id();
 };
 // Edge
+typedef enum kindOfEdge { directed, undirected } kEdge;
 struct Edge {
   int weight;
   pNode u, v;
@@ -31,13 +32,17 @@ struct Edge {
   void print();
 };
 // Graph
+extern int n, m;
 struct Graph {
-  int n, m;
+  kEdge kedge;
   pNode *V;
   std::list<pEdge> E;
 
+  Graph(void);
+  Graph(kEdge kedge_);
   Graph(int n_);
   Graph(int n_, int m_);
+  Graph(int n_, int m_, kEdge kedge_);
   ~Graph(void);
   pNode operator[](size_t i);
   void  add_edge(int u, int v);
@@ -45,6 +50,10 @@ struct Graph {
   void  add_edge_(int u, int v);
   void  add_edge_(int u, int v, int w);
   void  print();
+  void  read_directed_edges();
+  void  read_edges();
+  void  read_graph_size();
+  void  read_undirected_edges();
   void  sort_edges();
 };
 #endif

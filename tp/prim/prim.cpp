@@ -1,89 +1,78 @@
 #include <iostream>
-#include <vector>
 #include <stdlib.h>
 
-#include "../helper/helper.h"
 #include "../graph/graph.h"
-#include "heap.h"
+#include "../heap/heap.h"
 
 #define MYINF 10000
 
 using namespace std;
-
+//heap
 int *pos;
-int *heap, *weight, *pi;
 pHeap h;
+//prim
 bool *visited;
-Graph *G;
+int *pi;
+//Graph
+int n, m;
 
 void init()
 {
-  G = read_undirected_graph();
-  //heap = (int*) malloc((G->n+2)*sizeof(int));
-  //weight = (int*) malloc((G->n+2)*sizeof(int));
-  pos = (int*) malloc((G->n+2)*sizeof(int));
-  pi = (int*) malloc((G->n+2)*sizeof(int));
-  visited = (bool*) malloc((G->n+2)*sizeof(bool));
-  h = (pHeap) malloc((G->n+2)*sizeof(HItem));
+  pos = (int*) malloc((n+2)*sizeof(int));
+  pi = (int*) malloc((n+2)*sizeof(int));
+  visited = (bool*) malloc((n+2)*sizeof(bool));
+  h = (pHeap) malloc((n+2)*sizeof(HItem));
 }
 
 void erase_data() 
 {
-  //free(heap);
-  //free(weight);
   free(pos);
   free(pi);
   free(visited);
   free(h);
-  delete G;
 }
 
 void Prim() 
 {
+  Graph G(undirected);
+  G.read_edges();
+  
+  init();
   int i, j, v, tree_weight = 0;
-  list<pEdge>::iterator e;
   HItem u;
   
-  for (i = 0; i <= G->n+1; i++) {
+  for (i = 0; i <= n+1; i++) {
     visited[i] = false;
     h[i].v = i;
-    pos[i] = i;
     h[i].w = MYINF;
+    pos[i] = i;
     pi[i] = 0;
   }
-  visited[0] = visited[G->n+1] = true;
-  
+
+  visited[0] = visited[n+1] = true;
+
   h[1].w = 0;
-  build(h, G->n);
-  
-  j = G->n;
-  for (i = 1; i <= G->n; i++) {
-    //print_heap(h, j);
+  build(h, n);
+
+  j = n;
+  for (i = 1; i <= n; i++) {
     u = extract_min(h, &j);
     visited[u.v] = true;
     cout << pi[u.v] <<" - " << u.v << "(" << u.w << ")" << endl;
     tree_weight += u.w;
-    for (e = G->V[u.v]->adj.begin(); e != G->V[u.v]->adj.end(); ++e) {
-      v = (*e)->v->id;
-      //cout << " <" << v << ">: b:" << visited[v] << " w:" << h[pos[v]].w << " e.w:" <<  (*e)->weight << endl;
-      if (!visited[v] && (*e)->weight < h[pos[v]].w) {
-        //cout << "  ";
-        //print_heap(h, j);
-        decrease_key(pos[v], (*e)->weight, h);
-        //cout << "  ";
-        //print_heap(h, j);
+    for (auto& e : G[u.v]->adj) {
+      v = e->v->id;
+      if (!visited[v] && e->weight < h[pos[v]].w) {
+        decrease_key(pos[v], e->weight, h);
         pi[v] = u.v;
       }
     }
-    //print_heap(h, j);
-    //cout << "---------------------------" << endl;
   }
   cout << tree_weight << endl;
 }
 
 int main(int argc, char *argv[]) 
 {
-  init();
   Prim();
   erase_data();
 
