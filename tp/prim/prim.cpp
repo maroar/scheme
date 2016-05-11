@@ -2,6 +2,7 @@
 #include <vector>
 #include <stdlib.h>
 
+#include "../helper/helper.h"
 #include "../graph/graph.h"
 #include "heap.h"
 
@@ -9,75 +10,80 @@
 
 using namespace std;
 
-int n, m, *key, *weight, *pi;
+int *pos;
+int *heap, *weight, *pi;
+pHeap h;
 bool *visited;
 Graph *G;
 
-void read_data() {
-  int u, v, w;
-
-  cin >> n;
-  cin >> m;
-  
-  key = (int*) malloc(n*sizeof(int)+2);
-  weight = (int*) malloc(n*sizeof(int)+2);
-  pi = (int*) malloc(n*sizeof(int)+2);
-  visited = (bool*) malloc(n*sizeof(bool)+2);
-  G = new Graph(n+1);
-  
-  for (int i = 1; i <= m; i++) {
-    cin >> u;
-    cin >> v;
-    cin >> w;
-    G->add_edge(u, v, w);
-  }
+void init()
+{
+  G = read_undirected_graph();
+  //heap = (int*) malloc((G->n+2)*sizeof(int));
+  //weight = (int*) malloc((G->n+2)*sizeof(int));
+  pos = (int*) malloc((G->n+2)*sizeof(int));
+  pi = (int*) malloc((G->n+2)*sizeof(int));
+  visited = (bool*) malloc((G->n+2)*sizeof(bool));
+  h = (pHeap) malloc((G->n+2)*sizeof(HItem));
 }
 
 void erase_data() 
 {
-  free(key);
-  free(weight);
+  //free(heap);
+  //free(weight);
+  free(pos);
   free(pi);
   free(visited);
+  free(h);
   delete G;
 }
 
 void Prim() 
 {
-  int i, j, u, v, tree_weight = 0;
+  int i, j, v, tree_weight = 0;
   list<pEdge>::iterator e;
+  HItem u;
   
-  for (i = 1; i <= n; i++) {
-    key[i] = i;
-    weight[i] = MYINF;
-    pi[i] = 0;
+  for (i = 0; i <= G->n+1; i++) {
     visited[i] = false;
+    h[i].v = i;
+    pos[i] = i;
+    h[i].w = MYINF;
+    pi[i] = 0;
   }
+  visited[0] = visited[G->n+1] = true;
   
-  weight[1] = 0;
+  h[1].w = 0;
+  build(h, G->n);
   
-  //build(n, key, weight);
-  
-  j = n;
-  for (i = 1; i <= j; i++) {
-    //print_heap(key, n, weight);
-    u = extract_min(key, weight, &n);
-    visited[u] = true;
-    cout << pi[u] <<" - " << u << "(" << weight[u] << ")" << endl;
-    for(e = G->V[u]->adj.begin(); e != G->V[u]->adj.end(); ++e) {
+  j = G->n;
+  for (i = 1; i <= G->n; i++) {
+    //print_heap(h, j);
+    u = extract_min(h, &j);
+    visited[u.v] = true;
+    cout << pi[u.v] <<" - " << u.v << "(" << u.w << ")" << endl;
+    tree_weight += u.w;
+    for (e = G->V[u.v]->adj.begin(); e != G->V[u.v]->adj.end(); ++e) {
       v = (*e)->v->id;
-      if(!visited[v] && (*e)->weight < weight[v]) {
-        weight[v] = (*e)->weight;
-        reconstruct(1, n, key, weight);
-        pi[v] = u;
+      //cout << " <" << v << ">: b:" << visited[v] << " w:" << h[pos[v]].w << " e.w:" <<  (*e)->weight << endl;
+      if (!visited[v] && (*e)->weight < h[pos[v]].w) {
+        //cout << "  ";
+        //print_heap(h, j);
+        decrease_key(pos[v], (*e)->weight, h);
+        //cout << "  ";
+        //print_heap(h, j);
+        pi[v] = u.v;
       }
     }
+    //print_heap(h, j);
+    //cout << "---------------------------" << endl;
   }
+  cout << tree_weight << endl;
 }
 
-int main(int argc, char *argv[]) {
-
-  read_data();
+int main(int argc, char *argv[]) 
+{
+  init();
   Prim();
   erase_data();
 

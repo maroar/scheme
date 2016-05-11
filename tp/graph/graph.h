@@ -14,6 +14,7 @@ struct Node {
   std::list<pEdge> adj;
 
   Node(int id_) : id(id_) {};
+  ~Node(void);
   void add_edge(pNode v);
   void add_edge(pNode v, int w);
   void print();
@@ -38,7 +39,7 @@ struct Graph {
   Graph(int n_);
   Graph(int n_, int m_);
   ~Graph(void);
-  pNode operator[](int i);
+  pNode operator[](size_t i);
   void  add_edge(int u, int v);
   void  add_edge(int u, int v, int w);
   void  add_edge_(int u, int v);

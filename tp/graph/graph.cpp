@@ -9,6 +9,11 @@ template <typename T> bool PComp(T * const & a, T * const & b)
    return *a < *b;
 }
 // Node
+Node::~Node(void)
+{
+  while(!adj.empty()) delete adj.front(), adj.pop_front();
+}
+
 void Node::add_edge(pNode v)
 {
   adj.push_back(new Edge(this, v, 0));
@@ -61,9 +66,8 @@ void free_node(pNode v)
 void free_nodes(pNode* V, int n)
 {
   int i;
-  for (i = 0; i < n; i++) {
-    while(!V[i]->adj.empty()) delete V[i]->adj.front(), V[i]->adj.pop_front();
-    free_node(V[i]);
+  for (i = 0; i <= n; i++) {
+    delete V[i];
   }
   free(V);
 }
@@ -99,12 +103,12 @@ void Edge::print()
 // Graph
 Graph::Graph(int n_) : n(n_)
 {
-  V = create_nodes(n);
+  V = create_nodes(n+1);
 }
 
 Graph::Graph(int n_, int m_) : n(n_), m(m_) 
 {
-  V = create_nodes(n);
+  V = create_nodes(n+1);
 }
 
 Graph::~Graph(void)
@@ -113,7 +117,7 @@ Graph::~Graph(void)
   while(!E.empty()) delete E.front(), E.pop_front();
 }
 
-pNode Graph::operator[](int i) 
+pNode Graph::operator[](size_t i) 
 {
   return V[i];
 }
@@ -148,7 +152,7 @@ void Graph::add_edge_(int u, int v, int w)
 
 void Graph::print()
 {
-  print_nodes(V, n);
+  print_nodes(V, n+1);
 }
 
 void Graph::sort_edges() 
