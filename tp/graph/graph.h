@@ -19,6 +19,7 @@ struct Node {
   void add_edge(pNode v, int w);
   void print();
   void print_id();
+  pEdge get_best_edge();
 };
 // Edge
 typedef enum kindOfEdge { directed, undirected } kEdge;
