@@ -50,6 +50,7 @@ struct Graph {
   void  add_edge_(int u, int v);
   void  add_edge_(int u, int v, int w);
   void  print();
+  void  print_edges();
   void  read_directed_edges();
   void  read_edges();
   void  read_graph_size();

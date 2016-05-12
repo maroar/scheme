@@ -178,6 +178,13 @@ void Graph::print()
   print_nodes(V, n);
 }
 
+void Graph::print_edges()
+{
+  for (auto& e : E) {
+    e->print();
+  }
+}
+
 void Graph::read_edges()
 {
   if(kedge == directed)
