@@ -11,9 +11,6 @@ our Graph structure.
 #include <iostream>
 #include <fstream>
 
-#define DEBUG true
-#define TEST_FILENAME "test.txt"
-
 class Parser
 {
 public:

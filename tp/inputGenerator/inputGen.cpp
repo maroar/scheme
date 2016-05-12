@@ -1,9 +1,10 @@
-#include<time.h>
-#include<stdlib.h>
-#include<stdio.h>
-#include<stdlib.h>
-#include<list>
-#include<iostream>
+
+
+#include <time.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <list>
+#include <iostream>
 #define N 21
 #define M 10
 #define R 10
@@ -40,19 +41,26 @@ void combinations (int v[], int start, int n, int k, int maxk) {
         }
 }
 
-int main ()
+int main (int argc, char **argv)
 {
   bool *vf;
   int i, n, m, r, m_aux, m_max, m_min, *v, j, k, c_max, aux;
   list< pair< int, int> >::iterator it;
   list<int> fc;
   list<int>::iterator iti;
+  v = (int*) malloc(n*sizeof(int));
+  if (argc > 2)
+  {
+    n = atoi(argv[2]);
+    m_max = atoi(argv[3]);
+  }
+  else
+  {
+    n = (rand() % N)+N;
+    m_max = n*(n-1)/2;    
+  }
   
   srand (time(NULL));
- 
-  n = (rand() % N)+N;
-  m_max = n*(n-1)/2;
-  v = (int*) malloc(n*sizeof(int));
   m_min = n;
   do {
     m = (rand() % m_max) + m_min;
@@ -83,19 +91,3 @@ int main ()
   
   return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

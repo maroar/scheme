@@ -5,6 +5,7 @@ This module parses a text file into a Graph structure used in this project.
 */
 
 #include "data.h"
+// #define DEBUG
 
 Parser::Parser(){}
 Parser::~Parser(){}
@@ -21,7 +22,7 @@ Graph * Parser::parse_graph(std::string filename)
 	{
 		fs >> v1 >> v2 >> w;
 		#ifdef DEBUG
-			std::cout<< (v1--) << " " << (v2--) << " " << w << std::endl;
+			std::cout<< v1 << " " << v2 << " " << w << std::endl;
 		#endif
 		G->add_edge(v1, v2, w);
 	}
@@ -33,10 +34,4 @@ void Parser::test_parser(std::string filename)
 {
 	Graph * G = Parser::parse_graph(filename);
 	G->print();
-}
-
-int main()
-{
-	Parser ps;
-	ps.test_parser(TEST_FILENAME);
 }
