@@ -2,7 +2,7 @@
 #include <list>
 #include <vector>
 #include <iostream>
-// #define DEBUG
+#define DEBUG
 
 //Union-find algorithm. Each component is represented by a 
 //ROOT node. If two components have the same ROOT, they are obviously
@@ -48,6 +48,7 @@ void Boruvka::printComponents(Component * components, int size)
 	}
 }
 
+int n, m;
 std::list<Edge*> Boruvka::getMST(Graph* G)
 {
 	std::list<Edge*> MST;
@@ -56,8 +57,9 @@ std::list<Edge*> Boruvka::getMST(Graph* G)
 		std::cout<<"Graph not initialized. " << std::endl;
 		return MST;
 	}
-	int numNodes = G->n;
-	int numEdges = G->m;
+	int numNodes = n;
+	int numEdges = m;
+	G->sort_edges();
 	std::vector<Edge*> edges{std::begin(G->E), std::end(G->E)};
 	// #ifdef DEBUG
 	// 	std::cout << "\nEDGES: " << std::endl;
@@ -82,9 +84,7 @@ std::list<Edge*> Boruvka::getMST(Graph* G)
 		bestEdge[u] = -1;
 	}
 
-	// #ifdef DEBUG
-	// 	Boruvka::printComponents(components, numNodes);
-	// #endif
+
 
 	//Starting with an empty MST and number of components = V
 	int numComponents = numNodes;
@@ -92,8 +92,12 @@ std::list<Edge*> Boruvka::getMST(Graph* G)
 
 	while (numComponents > 1)
 	{
+		#ifdef DEBUG
+			Boruvka::printComponents(components, numNodes);
+		#endif
+
 		//Traverse through every EDGE and update the best edge for every component
-		for (unsigned u = 0; u < numEdges; u++)
+		for (unsigned u = 0; u < 2*numEdges; u++)
 		{
 			//Get the ID's of the nodes of the current edge
 			int source_ID = edges[u]->u->id;
@@ -121,12 +125,12 @@ std::list<Edge*> Boruvka::getMST(Graph* G)
 			else
 			{
 				if ((bestEdge[component_1 - 1] == -1) || 
-							(edges[bestEdge[component_1 - 1]]->weight > edges[u]->weight))
+							( (&edges[bestEdge[component_1 - 1]]) > (&edges[u]) ))
 				{
 					bestEdge[component_1 - 1] = u;
 				}
 				if ((bestEdge[component_2 - 1] == -1) || 
-							(edges[bestEdge[component_2 - 1]]->weight > edges[u]->weight))
+							( (&edges[bestEdge[component_2 - 1]]) > (&edges[u]) ))
 				{
 					bestEdge[component_2 - 1] = u;
 				}
@@ -150,7 +154,7 @@ std::list<Edge*> Boruvka::getMST(Graph* G)
 					continue;
 				MSTWeight += edges[bestEdge[u]]->weight;
 				MST.push_back(edges[bestEdge[u]]);
-				// #ifdef DEBUG
+				#ifdef DEBUG
 					std::cout << "Edge Included: " 
 										<< edges[bestEdge[u]]->u->id 
 										<< " To "
@@ -158,7 +162,7 @@ std::list<Edge*> Boruvka::getMST(Graph* G)
 										<< " Weight: " 
 										<< edges[bestEdge[u]]->weight
 										<< std::endl;
-				// #endif
+				#endif
 				//Union of the components that were connected
 				Boruvka::Union(components, component_1, component_2);
 				numComponents--;
