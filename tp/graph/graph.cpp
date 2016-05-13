@@ -1,5 +1,6 @@
 #include <iostream>
 #include <stdlib.h>
+
 #include "graph.h"
 
 using namespace std;
@@ -38,6 +39,11 @@ void Node::print()
 void Node::print_id()
 {
   cout << "v" << id;
+}
+
+pEdge Node::get_best_edge()
+{
+  return std::min(adj);
 }
 
 pNode create_node(int id)

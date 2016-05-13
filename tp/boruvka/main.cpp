@@ -15,7 +15,7 @@ int main(int argc, char ** argv)
 	Parser ps;
 	G = ps.parse_graph(filename);
 	G->sort_edges();
-	//G->print();
+	G->print();
 
 	Boruvka bo;
 	bo.getMST(G);	
