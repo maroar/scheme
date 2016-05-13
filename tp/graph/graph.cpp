@@ -43,7 +43,8 @@ void Node::print_id()
 
 pEdge Node::get_best_edge()
 {
-  return std::min(adj);
+  adj.sort(PComp<Edge>);
+  return adj.front();
 }
 
 pNode create_node(int id)
