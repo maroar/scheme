@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 #include "../graph/graph.h"
-//#include "../heap/heap.h"
+#include "../set/set.h"
 
 #define MYINF 10000
 
@@ -10,22 +10,28 @@ using namespace std;
 //Graph
 int n, m;
 //Kruskal
-int *group;
+pSet *set;
 
 void init()
 {
-  group= (int*) malloc((n+1)*sizeof(int));
+  set = (pSet*) malloc((n+1)*sizeof(pSet));
+  for (int i = 1; i <= n; i++) {
+    set[i] = make_set(i);
+  }
 }
 
 void erase_data() 
 {
-  free(group);
+  for (int i = 1; i <= n; i++) {
+    delete set[i];
+  }
+  free(set);
 }
 
-void print_group()
+void print_set()
 {
   for (int i = 1; i <= n; i++) {
-    cout << i << "(" << group[i] << ") ";
+    cout << set[i]->setId << "(" << set[i]->order << ", p={" << set[i]->parent->setId << "}) ";
   }
   cout << endl;
 }
@@ -38,12 +44,9 @@ pEdge next_edge(list<pEdge>::iterator& it)
     u = (*it)->u->id;
     v = (*it)->v->id;
     it++;
-  } while (group[u] == group[v]);
+  } while (find_set(set[u]) == find_set(set[v]));
   
-  if (group[u] < group[v])
-    group[v] = group[u];
-  else
-    group[u] = group[v];
+  union_set(set[u], set[v]);
 
   return (*it);
 }
@@ -59,16 +62,13 @@ int main(int argc, char *argv[])
   G.sort_edges();
 
   init();
-  for (i = 0; i <= n; i++) {
-    group[i] = i;
-  }
   
   it = G.E.begin();
   for (i = 1; i < n; i++) {
-    print_group();
+    //print_set();
     e = next_edge(it);
     e->print();
-    print_group();
+    //print_set();
     cout << "-----------" << endl;
     tree_weight += e->weight;
   }

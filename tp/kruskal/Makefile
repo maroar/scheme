@@ -1,2 +1,2 @@
-all: kruskal.cpp ../graph/graph.cpp
-	clang++ kruskal.cpp ../graph/graph.cpp -std=c++11
+all: kruskal.cpp ../graph/graph.cpp ../set/set.cpp
+	clang++ kruskal.cpp ../graph/graph.cpp ../set/set.cpp -std=c++11

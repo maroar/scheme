@@ -4,6 +4,7 @@ a.out
 *~
 *.exe
 *.a
+*.kate-swp
 3exerc/CMakeFiles/
 3exerc/CMakeCache.txt
 3exerc/Makefile
