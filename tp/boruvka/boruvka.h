@@ -6,15 +6,15 @@
 
 struct Component
 {
-	int parentID;
-	int rank;
+	Component * parent;
+	int ID, rank;
 }typedef Component;
 
 class Boruvka
 {
 private:
-	int find(Component* components, int i);
-	void Union(Component* components, int x, int y);
+	Component * find(Component* components);
+	void Union(Component * cp1, Component * cp2);
 	void printComponents(Component *components, int size);
 
 public:
