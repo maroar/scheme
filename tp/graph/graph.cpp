@@ -45,11 +45,6 @@ void Node::print_id()
 
 pEdge Node::get_best_edge()
 {
-  adj.sort(PComp<Edge>);
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
   return adj.front();
 }
 

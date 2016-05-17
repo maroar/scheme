@@ -80,38 +80,89 @@ std::list<Edge*> Boruvka::getMST(Graph* G)
 		std::cout<<"Graph not initialized. " << std::endl;
 		return MST;
 	}
-	#ifdef DEBUG
-		G->print();
-	#endif
+	// #ifdef DEBUG
+	// 	G->print_edges();
+	// #endif
 
 	int numNodes = n;
 	int numEdges = m;
 
+	std::vector<Edge*> allEdges{std::begin(G->E), std::end(G->E)};
+
 	//Every component
 	Component *components[numNodes];
 
-	//Best edge for each node
-	Edge *edges[numNodes];
+	// //Best edge for each node
+	// Edge *edges[numNodes];
+
+	//Stores the index for the best edges
+	int *bestEdgesIndexes;
+	bestEdgesIndexes = new int[numNodes];
 
 	//Make set of 1 node per component initially
 	//Get the best edge for each node
 	for (unsigned u = 0; u < numNodes; u++)
-		(*G)[u+1]->adj.sort();
-		edges[u] = (*G)[u+1]->adj.front();
+	{
+		bestEdgesIndexes[u] = -1;
 		components[u] = makeSet(u+1);
-
+	}
+		
 	int e = 0;
 	int MAX_MST_EDGES = numNodes - 1;
+	int MST_WEIGHT = 0;
+
+	std::cout << "Max number of edges: " << MAX_MST_EDGES << std::endl;
 
 	//While 
-	while (e <= MAX_MST_EDGES)
+	while (e < MAX_MST_EDGES)
 	{
+		//Update the best edges for each component again!
+		for (unsigned i = 0; i < allEdges.size(); i++)
+		{
+			Edge ed = *allEdges[i];
+			int u = ed.u->id;
+			int v = ed.v->id;
+			Component * cp1 = find(components[u-1]);
+			Component * cp2 = find(components[v-1]);
+			if (cp1 == cp2)
+			{
+				continue;
+			}			
+			if ((bestEdgesIndexes[u-1] == - 1) || (ed < *allEdges[bestEdgesIndexes[u-1]]))
+			{
+				bestEdgesIndexes[u-1] = i;
+			}
+			if((bestEdgesIndexes[v-1] == -1) || (ed < *allEdges[bestEdgesIndexes[v-1]]))
+			{
+				bestEdgesIndexes[v-1] = i;
+			}
+		}
+
 		for (unsigned u = 0; u < numNodes; u++)
 		{
-			Component * cp1 = find(components[u]);
+			Edge ed = *allEdges[bestEdgesIndexes[u]];
+			Component * cp1 = find(components[ed.u->id-1]);
+			Component * cp2 = find(components[ed.v->id-1]);
+			if (cp1 != cp2)
+			{
+				#ifdef DEBUG
+					std::cout << "picking edge: ";
+					ed.print();
+				#endif
+				e++;
+				MST.push_back(&ed);
+				MST_WEIGHT += ed.weight;
+				Union(cp1, cp2);
+				allEdges.erase(allEdges.begin() + (bestEdgesIndexes[u]));
+				bestEdgesIndexes[u] = - 1;
+			}
 		}
+
+		
+
 	}
 
+	std::cout<<"\n\nWeight of MST: " << MST_WEIGHT << std::endl;
 
 	return MST;
 }
