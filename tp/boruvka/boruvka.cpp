@@ -154,7 +154,7 @@ std::list<Edge*> Boruvka::getMST(Graph* G)
 				MST_WEIGHT += ed.weight;
 				Union(cp1, cp2);
 				allEdges.erase(allEdges.begin() + (bestEdgesIndexes[u]));
-				bestEdgesIndexes[u] = - 1;
+				bestEdgesIndexes[u] = -1;
 			}
 		}
 
