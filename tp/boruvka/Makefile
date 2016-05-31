@@ -1,2 +1,2 @@
-all: main.cpp boruvka.cpp ../graph/graph.cpp ../data/data.cpp
-	clang++ -std=c++11 main.cpp boruvka.cpp ../graph/graph.cpp ../data/data.cpp -o boruv
+all: brvk.cpp ../graph/graph.cpp ../set/set.cpp
+	g++ -g -std=c++11 brvk.cpp ../graph/graph.cpp ../set/set.cpp -o boruv

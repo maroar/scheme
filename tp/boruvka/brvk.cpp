@@ -18,7 +18,7 @@ void init()
 {
   set = (pSet*) malloc((n+1)*sizeof(pSet));
   best_edge = (pEdge*) malloc((n+1)*sizeof(pEdge));
-  for (int i = 1; i <= n; i++) {
+  for (int i = 0; i <= n; i++) {
     set[i] = make_set(i);
   }
 }
@@ -67,9 +67,15 @@ int main(int argc, char *argv[])
 
   init();
 
-  for (auto& e : G.E) {
-    adj[e->u->id].push_back((pEdge) e);
+  for (std::list<pEdge>::iterator it = G.E.begin(); it != G.E.end(); ++it)
+  {
+    e = *it;
+    adj[e->u->id].push_back(e);
   }
+
+  // for (auto& e : G.E) {
+  //   adj[e->u->id].push_back(e);
+  // }
 
   // //printint edges
   // for (auto &l : adj)
@@ -91,8 +97,10 @@ int main(int argc, char *argv[])
     {
       e = (pEdge) adj[i].front();
       // cout << "e:" << e->weight << "  be:" << best_edge[find_set(set[i])->setId]->weight << endl;
-      if (e->weight < best_edge[find_set(set[i])->setId]->weight)
-        best_edge[find_set(set[i])->setId] = e;
+      pSet root = find_set(set[i]);
+      cout << "Root id: " << root->setId << "\n";
+      if (e->weight < best_edge[root->setId]->weight)
+        best_edge[root->setId] = e;
       adj[i].pop_front();
     }
 
