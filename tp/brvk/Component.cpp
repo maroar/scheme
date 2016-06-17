@@ -2,10 +2,9 @@
 #include "Component.h"
 // CONSTRUCTOR
 Component::Component(pNode n)
-  : id(n->id), order(0), pos(nullptr) 
+  : id(n->id), order(0), pos(nullptr), to_update(nullptr) 
 {
   set_parent(this);
-  V.push_back(n);
 
   for (auto& e : n->adj) {
     E.push_back(e);
@@ -28,6 +27,9 @@ pComponent Component::next()
 
 void Component::get_best_edge() 
 {
+  if (to_update)
+    update(to_update);
+
   best_edge = *E.begin();
   for (auto& e : E) {
     if (*e < *best_edge) {
@@ -48,11 +50,9 @@ void Component::set_parent(pComponent p)
 
 void Component::update(pComponent c)
 {
-  for (auto& n : c->V) {
-    V.push_back(n);
-  }
   for (auto& e : c->E) {
-    E.push_back(e);
+    if (e->v->c->find_set() != this->find_set())
+      E.push_back(e);
   }
   vector<pEdge>::iterator it;
   for (it = E.begin(); it != E.end(); ) {
@@ -69,11 +69,11 @@ list<pComponent>::iterator Component::link_set(pComponent A, pComponent B, list<
 {
   if (A->order > B->order) {
     B->parent = A;
-    A->update(B);
+    A->to_update = B;
     return C.erase(B->pos);
   } else {
     A->parent = B;
-    B->update(A);
+    B->to_update = A;
     if (A->order == B->order) {
       B->order = B->order + 1;
     }

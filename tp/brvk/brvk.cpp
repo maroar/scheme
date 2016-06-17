@@ -36,12 +36,12 @@ int main(int argc, char **argv)
   all = C;
   // BORUVKA
   int tree_weight = 0;
-  list<pComponent>::iterator it, nxt;
+  list<pComponent>::iterator it, nxt, itc;
   while (C.size() > 1) {
-    for (auto& c : C) {
-      c->get_best_edge();
+    itc = it = C.begin();
+    for ( ; itc != C.end(); itc++) {
+      (*itc)->get_best_edge();
     }
-    it = C.begin();
     nxt = next(it);
     while (it != C.end()) {
       it = Component::union_components(it, nxt, C, &tree_weight);
