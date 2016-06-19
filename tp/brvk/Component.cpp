@@ -2,7 +2,7 @@
 #include "Component.h"
 // CONSTRUCTOR
 Component::Component(pNode n)
-  : id(n->id), order(0), pos(nullptr) 
+  : id(n->id), order(0) 
 {
   set_parent(this);
   V.push_back(n);
@@ -90,7 +90,7 @@ list<pComponent>::iterator Component::union_components(
   pComponent A = *it, 
              B = (*it)->best_edge->v->c;
   if (A->find_set() == B->find_set()) return nxt;
-  (*it)->best_edge->print();
+  // (*it)->best_edge->print();
   *w += (*it)->best_edge->weight;
   return union_set(A, B, C);
 }

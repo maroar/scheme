@@ -62,7 +62,7 @@ void genGraph(std::string filename, int size, int density)
       if (p >= prob || i == 0) //Guarantees a connected graph
       {
         m++;
-        weight = (std::rand()%MAXWEIGHT);
+        weight = (std::rand()%MAXWEIGHT) + 1;
         of  << i+1 << " "
             << j+1 << " "
             << weight
