@@ -12,7 +12,6 @@ typedef struct Component* pComponent;
 struct Component {
   int id, order;
   list<pComponent>::iterator pos;
-  pComponent parent;
   pComponent parent, to_update;
   pEdge best_edge;
   vector<pNode> V;

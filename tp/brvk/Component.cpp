@@ -1,12 +1,7 @@
 #include <iostream>
 #include "Component.h"
 // CONSTRUCTOR
-Component::Component(pNode n)
-<<<<<<< HEAD
-  : id(n->id), order(0) 
-=======
-  : id(n->id), order(0), pos(nullptr), to_update(nullptr) 
->>>>>>> origin/master
+Component::Component(pNode n) : id(n->id), order(0) 
 {
   set_parent(this);
 
