@@ -1,10 +1,10 @@
-
-
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <list>
 #include <iostream>
+#include <string>
+
 #define N 21
 #define M 10
 #define R 10
@@ -47,19 +47,25 @@ int main (int argc, char **argv)
   int i, n, m, r, m_aux, m_max, m_min, *v, j, k, c_max, aux;
   list< pair< int, int> >::iterator it;
   list<int> fc;
-  list<int>::iterator iti;
-  v = (int*) malloc(n*sizeof(int));
-  if (argc > 2)
+  list<int>::iterator iti;  
+  if (argc > 1)
   {
-    n = atoi(argv[2]);
-    m_max = atoi(argv[3]);
+    n = stoi(string(argv[1]));
+    if (argc > 2) 
+    {
+      m_max = stoi(string(argv[2]));
+    }
+    else 
+    {
+      m_max = n*(n-1)/2 ;
+    }
   }
   else
   {
     n = (rand() % N)+N;
     m_max = n*(n-1)/2;    
   }
-  
+  v = (int*) malloc(n*sizeof(int));
   srand (time(NULL));
   m_min = n;
   do {
