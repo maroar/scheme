@@ -39,10 +39,6 @@ int main(int argc, char **argv)
   list<pComponent>::iterator it, nxt, itc;
   while (C.size() > 1)
   {
-    for (auto& c : C)
-    {
-      c->get_best_edge();
-    }
     itc = it = C.begin();
     for ( ; itc != C.end(); itc++)
     {
