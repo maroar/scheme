@@ -46,11 +46,23 @@ int main(int argc, char **argv)
     }
     it = C.begin();
     nxt = next(it);
+    #ifdef DEBUG
+      for (auto &i : C) {
+        i->print();
+      }
+      cout << endl << "----------------" << endl;
+    #endif
     while (it != C.end())
     {
       it = Component::union_components(it, nxt, C, &tree_weight);
       nxt = next(it);
     }
+    #ifdef DEBUG
+      for (auto &i : C) {
+        i->print();
+      }
+      cout << endl << "__________________________________" << endl;
+    #endif
   }
   cout << tree_weight << endl;
   while(!all.empty()) delete all.back(), all.pop_back();

@@ -1,7 +1,7 @@
 #include <iostream>
 #include "Component.h"
 // CONSTRUCTOR
-Component::Component(pNode n) : id(n->id), order(0), to_update(nullptr) 
+Component::Component(pNode n) : id(n->id), order(0)
 {
   set_parent(this);
 
@@ -24,10 +24,19 @@ pComponent Component::next()
   return parent;
 }
 
+void Component::add_to_update(pComponent p)
+{
+  for (auto &itt : p->to_update) {
+    to_update.push_back(itt);
+  }
+  to_update.push_back(p);
+  p->to_update.clear();
+}
+
 void Component::get_best_edge() 
 {
-  if (to_update)
-    update(to_update);
+  for (auto &c : to_update)
+    update(c);
 
   best_edge = *E.begin();
   for (auto& e : E) {
@@ -68,11 +77,13 @@ list<pComponent>::iterator Component::link_set(pComponent A, pComponent B, list<
 {
   if (A->order > B->order) {
     B->parent = A;
-    A->to_update = B;
+    //A->update(B);
+    A->add_to_update(B);
     return C.erase(B->pos);
   } else {
     A->parent = B;
-    B->to_update = A;
+    //B->update(A);
+    B->add_to_update(A);
     if (A->order == B->order) {
       B->order = B->order + 1;
     }
@@ -89,7 +100,9 @@ list<pComponent>::iterator Component::union_components(
   pComponent A = *it, 
              B = (*it)->best_edge->v->c;
   if (A->find_set() == B->find_set()) return nxt;
-  // (*it)->best_edge->print();
+  #ifdef DEBUG
+    (*it)->best_edge->print();
+  #endif
   *w += (*it)->best_edge->weight;
   return union_set(A, B, C);
 }

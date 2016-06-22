@@ -4,6 +4,7 @@
 #include "graph.h"
 #include <vector>
 #include <list>
+#define DEBUG
 
 using namespace std;
 
@@ -12,7 +13,8 @@ typedef struct Component* pComponent;
 struct Component {
   int id, order;
   list<pComponent>::iterator pos;
-  pComponent parent, to_update;
+  list<pComponent> to_update;
+  pComponent parent;
   pEdge best_edge;
   vector<pNode> V;
   vector<pEdge> E;
@@ -22,6 +24,7 @@ struct Component {
   // OBJ
   pComponent  find_set();
   pComponent  next();
+  void        add_to_update(pComponent p);
   void        get_best_edge();
   void        print();
   void        set_parent(pComponent p);
