@@ -1,6 +1,6 @@
 #include <iostream>
 #include <iterator>
-#include <list>
+#include <vector>
 #include "graph.h"
 #include "Component.h"
 
@@ -23,48 +23,49 @@ int main(int argc, char **argv)
     G.add_edge(u, v, w);
   }
   // CREATE THE COMPONENTS
+  int size = n;
   pComponent c;
   pNode node;
-  list<pComponent> C, all;
+  vector<pComponent> C(n);
   for (int i = 1; i <= n; i++) {
     node = G[i];
     c = new Component(node);
     node->c = c;
-    C.push_back(c);
-    c->pos = prev(C.end());
+    C[i-1] = c;
+    c->pos = i-1;
   }
-  all = C;
   // BORUVKA
   int tree_weight = 0;
-  list<pComponent>::iterator it, nxt, itc;
-  while (C.size() > 1)
+  //list<pComponent>::iterator it, nxt, itc;
+  while (size > 1)
   {
-    itc = it = C.begin();
-    for ( ; itc != C.end(); itc++)
+    for (int i = 0; i < size; i++)
     {
-      (*itc)->get_best_edge();
+      C[i]->get_best_edge();
     }
-    it = C.begin();
-    nxt = next(it);
     #ifdef DEBUG
-      for (auto &i : C) {
-        i->print();
+      for (int i = 0; i < size; i++) {
+        C[i]->print();
       }
       cout << endl << "----------------" << endl;
     #endif
-    while (it != C.end())
+    for (int i = 0; i < size; )
     {
-      it = Component::union_components(it, nxt, C, &tree_weight);
-      nxt = next(it);
+      if (Component::union_components(i, C, &size, &tree_weight))
+        i++;
     }
     #ifdef DEBUG
-      for (auto &i : C) {
-        i->print();
+      for (int i = 0; i < size; i++) {
+        C[i]->print();
       }
       cout << endl << "__________________________________" << endl;
     #endif
   }
   cout << tree_weight << endl;
-  while(!all.empty()) delete all.back(), all.pop_back();
+  while(!C.empty()) {
+    if (C.back())
+      delete C.back(); 
+    C.pop_back();
+  }
   return 0;
 }
