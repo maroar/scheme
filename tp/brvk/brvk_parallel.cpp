@@ -1,20 +1,21 @@
 #include <iostream>
 #include <iterator>
 #include <list>
+#include <chrono>
 #include <omp.h>
 #include "graph.h"
 #include "Component.h"
 
-#define NUM_THREADS 8
+#define NUM_THREADS 32
 
 using namespace std;
 
+using ns = std::chrono::milliseconds;
+using s = std::chrono::seconds;
+using get_time = std::chrono::steady_clock;
 
 int main(int argc, char **argv) 
 {
-  omp_set_nested(1);
-  omp_set_num_threads(NUM_THREADS);
-
   // READ THE GRAPH
   int m, n, u, v, w;
   // read graph size
@@ -29,65 +30,96 @@ int main(int argc, char **argv)
     cin >> w;
     G.add_edge(u, v, w);
   }
-
   // CREATE THE COMPONENTS
+  int size = n;
   pComponent c;
   pNode node;
-  list<pComponent> C, all;
-
-  // #pragma omp parallel for num_threads(NUM_THREADS)
-  for (int i = 1; i <= n; i++)
-  {
+  vector<pComponent> C(n);
+  for (int i = 1; i <= n; i++) {
     node = G[i];
     c = new Component(node);
     node->c = c;
-    C.push_back(c);
-    c->pos = prev(C.end());
+    C[i-1] = c;
+    c->pos = i-1;
   }
   
-  all = C;
-
-  // BORUVKA
+  //MST
   int tree_weight = 0;
-  list<pComponent>::iterator it, nxt, itc;
-  int size = C.size();
-  while (size > 1) 
+
+  //Private variables
+  int i, id, nthreads;
+
+  //Measuring time
+  get_time::time_point start = get_time::now();
+  get_time::duration gbe_(0);
+  get_time::duration union_(0);
+
+  while (size > 1)
   {
-    
-    itc = it = C.begin();
-    #pragma omp parallel
-    #pragma omp single
-    for ( ; itc != C.end(); itc++)
-    {
-      #pragma omp task
-      (*itc)->get_best_edge();
-    }
-    it = C.begin();
-    nxt = next(it);
-    
-    #ifdef DEBUG
-      for (auto &i : C) {
-        i->print();
-      }
-      cout << endl << "----------------" << endl;
-    #endif
-    
-    #pragma omp taskwait
+    omp_set_nested(true);
+    get_time::time_point start_aux = get_time::now();
 
-    while (it != C.end())
+    #pragma omp parallel private(i, id, nthreads) shared(C) num_threads(NUM_THREADS)
     {
-      it = Component::union_components(it, nxt, C, &tree_weight);
-      nxt = next(it);
+      nthreads = omp_get_num_threads();
+      id = omp_get_thread_num();
+
+      // #pragma atomic
+      // std::cout<< id << " " << std::endl;  
+
+      for (i=id; i < size; i += nthreads)
+      {
+        C[i]->get_best_edge();
+      }
+    }
+    get_time::time_point end_aux = get_time::now();
+    gbe_ = gbe_ + (end_aux - start_aux);
+
+
+    // std::cout << "1 " << std::endl;
+    // #ifdef DEBUG
+    //   for (int i = 0; i < size; i++) {
+    //     C[i]->print();
+    //   }
+    //   cout << endl << "----------------" << endl;
+    // #endif
+    start_aux = get_time::now();
+
+    for (int i = 0; i < size; )
+    {
+      if (Component::union_components(i, C, &size, &tree_weight))
+        i++;
     }
 
-    #ifdef DEBUG
-      for (auto &i : C) {
-        i->print();
-      }
-      cout << endl << "__________________________________" << endl;
-    #endif
+    end_aux = get_time::now();
+    union_ = union_ + (end_aux - start_aux);
+    // std::cout << "2 " << std::endl;
+    // #ifdef DEBUG
+    //   for (int i = 0; i < size; i++) {
+    //     C[i]->print();
+    //   }
+    //   cout << endl << "__________________________________" << endl;
+    // #endif
   }
-  cout << tree_weight << endl;
-  while(!all.empty()) delete all.back(), all.pop_back();
+
+  //Time measuring
+  get_time::time_point end = get_time::now();
+  get_time::duration tot_diff = end - start;
+  cout << "MST Weight: "  << tree_weight << endl;
+  cout  << "GetBestEdge Elapsed Time:  " 
+        << chrono::duration_cast<ns>(gbe_).count()
+        <<" ns " << endl;
+  cout  << "Union Elapsed Time:  " 
+        << chrono::duration_cast<ns>(union_).count()
+        <<" ns " << endl;
+  cout  << "Total Elapsed Time:  " 
+        << chrono::duration_cast<ns>(tot_diff).count()
+        <<" ns " << endl;
+
+  while(!C.empty()) {
+    if (C.back())
+      delete C.back(); 
+    C.pop_back();
+  }
   return 0;
 }

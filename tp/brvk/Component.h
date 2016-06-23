@@ -4,7 +4,7 @@
 #include "graph.h"
 #include <vector>
 #include <list>
-#define DEBUG
+// #define DEBUG
 
 using namespace std;
 

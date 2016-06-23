@@ -43,23 +43,23 @@ int main(int argc, char **argv)
     {
       C[i]->get_best_edge();
     }
-    #ifdef DEBUG
-      for (int i = 0; i < size; i++) {
-        C[i]->print();
-      }
-      cout << endl << "----------------" << endl;
-    #endif
+    // #ifdef DEBUG
+    //   for (int i = 0; i < size; i++) {
+    //     C[i]->print();
+    //   }
+    //   cout << endl << "----------------" << endl;
+    // #endif
     for (int i = 0; i < size; )
     {
       if (Component::union_components(i, C, &size, &tree_weight))
         i++;
     }
-    #ifdef DEBUG
-      for (int i = 0; i < size; i++) {
-        C[i]->print();
-      }
-      cout << endl << "__________________________________" << endl;
-    #endif
+    // #ifdef DEBUG
+    //   for (int i = 0; i < size; i++) {
+    //     C[i]->print();
+    //   }
+    //   cout << endl << "__________________________________" << endl;
+    // #endif
   }
   cout << tree_weight << endl;
   while(!C.empty()) {

@@ -6,6 +6,7 @@
 #include <fstream>
 #include <cstring>
 #include <string>
+#include <sstream>
 #define FILEOUT "test.txt"
 #define SIZE 10
 #define DENSITY 4
@@ -51,15 +52,14 @@ void genGraph(std::string filename, int size, int density)
   double p = density*0.25;
   double prob;
   std::srand(std::time(0));
-  std::ofstream of;
-  of.open(filename);
+  std::stringstream of;
   //Set the macro DIRECTED if you want the graph to be directed, so there will be
   //edges from J to I as well. If not, J will start from I.
   for (int i = 0; i<size; i++)
     for (int j = EDGES(DIRECTED); j < size; j++)
     {
       prob = ((double) std::rand() / (RAND_MAX));
-      if (p >= prob || i == 0) //Guarantees a connected graph
+      if (p >= prob || i <= 0) //Guarantees a connected graph
       {
         m++;
         weight = (std::rand()%MAXWEIGHT) + 1;
@@ -70,8 +70,11 @@ void genGraph(std::string filename, int size, int density)
       }
     }
 
-    of.seekp(0);
-    of << size << " " << m << std::endl;
+    std::ofstream of_append;
+    of_append.open(filename);
+    of_append << size << " " << m << std::endl;
+    of_append << of.str();
+
 
 
     return;
