@@ -11,8 +11,7 @@ using namespace std;
 typedef struct Component* pComponent;
 
 struct Component {
-  int id, order;
-  list<pComponent>::iterator pos;
+  int id, order, pos;
   list<pComponent> to_update;
   pComponent parent;
   pEdge best_edge;
@@ -30,9 +29,9 @@ struct Component {
   void        set_parent(pComponent p);
   void        update(pComponent c);
   // CLASS
-  static list<pComponent>::iterator link_set(pComponent A, pComponent B, list<pComponent>& C);
-  static list<pComponent>::iterator union_components(list<pComponent>::iterator it, list<pComponent>::iterator nxt, list<pComponent>& C, int* w);
-  static list<pComponent>::iterator union_set(pComponent A, pComponent B, list<pComponent>& C);
+  static bool link_set(pComponent A, pComponent B, vector<pComponent>& C, int *s);
+  static bool union_components(int i, vector<pComponent>& C, int *s, int *w);
+  static bool union_set(pComponent A, pComponent B, vector<pComponent> &C, int *s);
 };
 
 #endif
