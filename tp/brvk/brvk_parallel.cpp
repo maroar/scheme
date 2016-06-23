@@ -49,28 +49,43 @@ int main(int argc, char **argv)
 
   // BORUVKA
   int tree_weight = 0;
-  list<pComponent>::iterator it, nxt;
+  list<pComponent>::iterator it, nxt, itc;
   int size = C.size();
   while (size > 1) 
   {
+    
+    itc = it = C.begin();
     #pragma omp parallel
     #pragma omp single
+    for ( ; itc != C.end(); itc++)
     {
-      for (list<pComponent>::iterator cc = C.begin(); cc != C.end(); ++cc)
-      {
-        #pragma omp task
-        (*cc)->get_best_edge();
-      }      
+      #pragma omp task
+      (*itc)->get_best_edge();
     }
-
     it = C.begin();
     nxt = next(it);
+    
+    #ifdef DEBUG
+      for (auto &i : C) {
+        i->print();
+      }
+      cout << endl << "----------------" << endl;
+    #endif
+    
+    #pragma omp taskwait
+
     while (it != C.end())
     {
       it = Component::union_components(it, nxt, C, &tree_weight);
       nxt = next(it);
     }
-    size = C.size();
+
+    #ifdef DEBUG
+      for (auto &i : C) {
+        i->print();
+      }
+      cout << endl << "__________________________________" << endl;
+    #endif
   }
   cout << tree_weight << endl;
   while(!all.empty()) delete all.back(), all.pop_back();
