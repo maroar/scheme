@@ -33,12 +33,10 @@ int main(int argc, char **argv)
     c = new Component(node);
     node->c = c;
     C[i-1] = c;
-    c->pos = i-1;
     cheapest[i] = -1;
   }
   // BORUVKA
   int tree_weight = 0;
-  int debug;
   while (size > 1)
   {
     // traverse through all edges and update cheapest of every component
@@ -70,7 +68,6 @@ int main(int argc, char **argv)
         size--;
       }
     }
-    cin >> debug;
   }
   cout << tree_weight << endl;
   while(!C.empty()) {

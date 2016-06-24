@@ -11,7 +11,7 @@ using namespace std;
 typedef struct Component* pComponent;
 
 struct Component {
-  int id, order, pos;
+  int id, order;
   pComponent parent;
   // CONSTRUCTOR
   Component(pNode n);

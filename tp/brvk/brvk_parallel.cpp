@@ -1,20 +1,47 @@
+#include <algorithm>
 #include <iostream>
-#include <iterator>
-#include <list>
-#include <omp.h>
+#include <mutex>
+#include <thread>
+#include <vector>
+
 #include "graph.h"
 #include "Component.h"
 
-#define NUM_THREADS 8
+#define NUM_THREADS 2
 
 using namespace std;
+int num_threads, // total number of threads
+      workspace, // amount of work to each thread
+      rest;      // rest of the work
+vector<int> cheapest;
+mutex cheapest_mutex;
 
+struct task {
+  int begin, end, id;
+  Graph* G;
+
+  task(Graph* G_) : G(G_) {};
+
+  void operator()() {
+    for (int i = begin; i <= end; i++) {
+      pComponent set1 = G->E[i]->u->c->find_set();
+      pComponent set2 = G->E[i]->v->c->find_set();
+      if (set1 == set2) {
+        continue;
+      } else {
+        cheapest_mutex.lock();
+        if (cheapest[set1->id] == -1 || G->E[cheapest[set1->id]]->weight > G->E[i]->weight)
+          cheapest[set1->id] = i;
+        if (cheapest[set2->id] == -1 || G->E[cheapest[set2->id]]->weight > G->E[i]->weight)
+          cheapest[set2->id] = i;
+        cheapest_mutex.unlock();
+      }
+    }
+  }
+};
 
 int main(int argc, char **argv) 
 {
-  omp_set_nested(1);
-  omp_set_num_threads(NUM_THREADS);
-
   // READ THE GRAPH
   int m, n, u, v, w;
   // read graph size
@@ -29,50 +56,87 @@ int main(int argc, char **argv)
     cin >> w;
     G.add_edge(u, v, w);
   }
-
   // CREATE THE COMPONENTS
+  int size = n;
   pComponent c;
   pNode node;
-  list<pComponent> C, all;
-
-  // #pragma omp parallel for num_threads(NUM_THREADS)
-  for (int i = 1; i <= n; i++)
-  {
+  vector<pComponent> C(n);
+  cheapest.resize(n+1);
+  for (int i = 1; i <= n; i++) {
     node = G[i];
     c = new Component(node);
     node->c = c;
-    C.push_back(c);
-    c->pos = prev(C.end());
+    C[i-1] = c;
+    cheapest[i] = -1;
   }
+  // BORUVKA PARALLEL
+  int tree_weight = 0; 
+  // preparing parellel data
+  vector<thread> threads;
+  int max_edges = m << 1;
+  num_threads = NUM_THREADS,
+  workspace = max_edges / NUM_THREADS,
+  rest = max_edges % NUM_THREADS;
+  if (rest) {
+    num_threads++;
+  }
+  vector<task> tsk(num_threads, task(&G));
+  for (int i = 0; i < num_threads; i++) {
+    tsk[i].id = i;
+    tsk[i].begin = workspace * i;
+    tsk[i].end = tsk[i].begin + workspace - 1;
+  }
+  if (rest)
+    tsk[NUM_THREADS].end = tsk[NUM_THREADS].begin + rest -1;
   
-  all = C;
-
-  // BORUVKA
-  int tree_weight = 0;
-  list<pComponent>::iterator it, nxt;
-  int size = C.size();
-  while (size > 1) 
-  {
-    #pragma omp parallel
-    #pragma omp single
-    {
-      for (list<pComponent>::iterator cc = C.begin(); cc != C.end(); ++cc)
-      {
-        #pragma omp task
-        (*cc)->get_best_edge();
-      }      
+  /*for (int i = 0; i < num_threads; i++) {
+    cout << "thread" << i << ":" << endl;
+    cout << "start:" << tsk[i].begin << " finish:" << tsk[i].end << endl;
+    cout << "--------------------------------- " << endl;
+  }*/
+  while (size > 1) {
+    // traverse through all edges and update cheapest of every component
+    for (int i = 0; i < num_threads; i++) {
+      threads.push_back(thread(tsk[i]));
     }
-
-    it = C.begin();
-    nxt = next(it);
-    while (it != C.end())
-    {
-      it = Component::union_components(it, nxt, C, &tree_weight);
-      nxt = next(it);
+    for (int i = 0; i < num_threads; i++) {
+      threads[i].join();
     }
-    size = C.size();
+    threads.clear();
+    /*for (int i = 0; i < max_edges; i++) {
+      pComponent set1 = G.E[i]->u->c->find_set();
+      pComponent set2 = G.E[i]->v->c->find_set();
+      if (set1 == set2) {
+        continue;
+      } else {
+        if (cheapest[set1->id] == -1 || G.E[cheapest[set1->id]]->weight > G.E[i]->weight)
+          cheapest[set1->id] = i;
+        if (cheapest[set2->id] == -1 || G.E[cheapest[set2->id]]->weight > G.E[i]->weight)
+          cheapest[set2->id] = i;
+      }
+    }*/
+    // Consider the above picked cheapest edges and add them to MST
+    for (int i = 1; i <= n; i++) {
+      if (cheapest[i] != -1) {
+        pComponent set1 = G.E[cheapest[i]]->u->c->find_set();
+        pComponent set2 = G.E[cheapest[i]]->v->c->find_set();
+
+        if (set1 == set2) {
+          continue;
+        }
+
+        tree_weight += G.E[cheapest[i]]->weight;
+        Component::union_set(set1, set2);
+        cheapest[set1->id] = cheapest[set2->id] = -1;
+        size--;
+      }
+    }
   }
   cout << tree_weight << endl;
-  while(!all.empty()) delete all.back(), all.pop_back();
+  while(!C.empty()) {
+    if (C.back())
+      delete C.back(); 
+    C.pop_back();
+  }
   return 0;
 }

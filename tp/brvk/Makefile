@@ -1,6 +1,18 @@
 all: 
 	g++ -std=c++11 brvk.cpp graph.cpp Component.cpp -o brvk.exe
 
+p: 
+	g++ -std=c++11 -pthread brvk_parallel.cpp graph.cpp Component.cpp -o brvkp.exe
+
+pg:
+	g++ -g -std=c++11 -pthread brvk_parallel.cpp graph.cpp Component.cpp -o brvkp.exe
+
+rp: 
+	time ./brvkp.exe < ../inputGenerator/$(TARGET)
+
+vp: 
+	valgrind --leak-check=full ./brvkp.exe < ../inputGenerator/$(TARGET)	
+
 parallel:
 	clang-omp++ -fopenmp -std=c++11 brvk_parallel.cpp graph.cpp Component.cpp -o prl.exe
 
@@ -20,7 +32,7 @@ v:
 	valgrind --leak-check=full ./brvk.exe < ../inputGenerator/$(TARGET)
 
 x:
-	./brvk.exe < 1_test.txt
+	time ./brvk.exe < ../inputGenerator/$(TARGET)
 
 runpar:
 	time ./prl.exe < ../inputGenerator/$(TARGET)
