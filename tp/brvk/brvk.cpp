@@ -27,39 +27,50 @@ int main(int argc, char **argv)
   pComponent c;
   pNode node;
   vector<pComponent> C(n);
+  vector<int> cheapest(n+1);
   for (int i = 1; i <= n; i++) {
     node = G[i];
     c = new Component(node);
     node->c = c;
     C[i-1] = c;
     c->pos = i-1;
+    cheapest[i] = -1;
   }
   // BORUVKA
   int tree_weight = 0;
-  //list<pComponent>::iterator it, nxt, itc;
+  int debug;
   while (size > 1)
   {
-    for (int i = 0; i < size; i++)
-    {
-      C[i]->get_best_edge();
-    }
-    #ifdef DEBUG
-      for (int i = 0; i < size; i++) {
-        C[i]->print();
+    // traverse through all edges and update cheapest of every component
+    for (int i = 0; i < (m<<1); i++) {
+      pComponent set1 = G.E[i]->u->c->find_set();
+      pComponent set2 = G.E[i]->v->c->find_set();
+      if (set1 == set2) {
+        continue;
+      } else {
+        if (cheapest[set1->id] == -1 || G.E[cheapest[set1->id]]->weight > G.E[i]->weight)
+          cheapest[set1->id] = i;
+        if (cheapest[set2->id] == -1 || G.E[cheapest[set2->id]]->weight > G.E[i]->weight)
+          cheapest[set2->id] = i;
       }
-      cout << endl << "----------------" << endl;
-    #endif
-    for (int i = 0; i < size; )
-    {
-      if (Component::union_components(i, C, &size, &tree_weight))
-        i++;
     }
-    #ifdef DEBUG
-      for (int i = 0; i < size; i++) {
-        C[i]->print();
+    // Consider the above picked cheapest edges and add them to MST
+    for (int i = 1; i <= n; i++) {
+      if (cheapest[i] != -1) {
+        pComponent set1 = G.E[cheapest[i]]->u->c->find_set();
+        pComponent set2 = G.E[cheapest[i]]->v->c->find_set();
+
+        if (set1 == set2) {
+          continue;
+        }
+
+        tree_weight += G.E[cheapest[i]]->weight;
+        Component::union_set(set1, set2);
+        cheapest[set1->id] = cheapest[set2->id] = -1;
+        size--;
       }
-      cout << endl << "__________________________________" << endl;
-    #endif
+    }
+    cin >> debug;
   }
   cout << tree_weight << endl;
   while(!C.empty()) {
