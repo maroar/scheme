@@ -27,6 +27,11 @@ void Node::add_edge(pNode v, int w)
   adj.push_back(new Edge(this, v, w));
 }
 
+void Node::add_edge(pNode v, int w, int i)
+{
+  adj.push_back(new Edge(this, v, w, i));
+}
+
 void Node::print()
 {
   print_id();
@@ -90,6 +95,7 @@ void print_nodes(vector<pNode>& V, int n_)
   cout << "______________________" << endl;
 }
 // Edge
+int Edge::edge_cnt = 0;
 bool Edge::operator<(const Edge& r)
 {
   if ((weight != r.weight))
@@ -103,7 +109,7 @@ bool Edge::operator<(const Edge& r)
 
 void Edge::print()
 {
-  cout << u->id << " - " << v->id << "(" << weight << ")" << endl;
+  cout << i << ") " << u->id << " - " << v->id << "(" << weight << ")" << endl;
 }
 // Graph
 Graph::Graph(int n_) : kedge(undirected)
@@ -152,18 +158,22 @@ pNode Graph::operator[](size_t i)
 
 void Graph::add_edge(int u, int v)
 {
-  V[u]->add_edge(V[v]);
-  V[v]->add_edge(V[u]);
-  E.push_back(new Edge(V[u], V[v], 0));
-  E.push_back(new Edge(V[v], V[u], 0));
+  pEdge e1 = new Edge(V[u], V[v], 0);
+  pEdge e2 = new Edge(V[v], V[u], 0);
+  V[u]->add_edge(V[v], 0, e1->i);
+  V[v]->add_edge(V[u], 0, e2->i);
+  E.push_back(e1);
+  E.push_back(e2);
 }
 
 void Graph::add_edge(int u, int v, int w)
 {
-  V[u]->add_edge(V[v], w);
-  V[v]->add_edge(V[u], w);
-  E.push_back(new Edge(V[u], V[v], w));
-  E.push_back(new Edge(V[v], V[u], w));
+  pEdge e1 = new Edge(V[u], V[v], w);
+  pEdge e2 = new Edge(V[v], V[u], w);
+  V[u]->add_edge(V[v], w, e1->i);
+  V[v]->add_edge(V[u], w, e2->i);
+  E.push_back(e1);
+  E.push_back(e2);
 }
 
 void Graph::add_edge_(int u, int v)
