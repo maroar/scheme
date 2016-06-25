@@ -27,18 +27,18 @@ bool same (int l, int r)
 }
 
 void combinations (int v[], int start, int n, int k, int maxk) {
-        int     i;
-        if (k > maxk) {
-                /* insert code here to use combinations as you please */
-                //for (i=1; i<=maxk; i++) printf ("%i ", v[i]);
-                //printf ("\n");
-                f.push_back(make_pair(v[1], v[2]));
-                return;
-        }
-        for (i=start; i<=n; i++) {
-                v[k] = i;
-                combinations (v, i+1, n, k+1, maxk);
-        }
+  int i;
+  if (k > maxk) {
+    /* insert code here to use combinations as you please */
+    //for (i=1; i<=maxk; i++) printf ("%i ", v[i]);
+    //printf ("\n");
+    f.push_back(make_pair(v[1], v[2]));
+    return;
+  }
+  for (i=start; i<=n; i++) {
+    v[k] = i;
+    combinations (v, i+1, n, k+1, maxk);
+  }
 }
 
 int main (int argc, char **argv)
@@ -48,20 +48,14 @@ int main (int argc, char **argv)
   list< pair< int, int> >::iterator it;
   list<int> fc;
   list<int>::iterator iti;  
-  if (argc > 1)
-  {
+  if (argc > 1) {
     n = stoi(string(argv[1]));
-    if (argc > 2) 
-    {
+    if (argc > 2) {
       m_max = stoi(string(argv[2]));
-    }
-    else 
-    {
+    } else {
       m_max = n*(n-1)/2 ;
     }
-  }
-  else
-  {
+  } else {
     n = (rand() % N)+N;
     m_max = n*(n-1)/2;    
   }

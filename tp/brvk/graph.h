@@ -21,6 +21,7 @@ struct Node {
   ~Node(void);
   void add_edge(pNode v);
   void add_edge(pNode v, int w);
+  void add_edge(pNode v, int w, int i);
   void print();
   void print_id();
   pEdge get_best_edge();
@@ -28,11 +29,13 @@ struct Node {
 // Edge
 typedef enum kindOfEdge { directed, undirected } kEdge;
 struct Edge {
-  int weight;
+  int weight, i;
   pNode u, v;
+  static int edge_cnt;
 
-  Edge(pNode u_, pNode v_) : u(u_), v(v_), weight(0) {};
-  Edge(pNode u_, pNode v_, int w) : u(u_), v(v_), weight(w) {};
+  Edge(pNode u_, pNode v_) : u(u_), v(v_), weight(0) {i = edge_cnt++;};
+  Edge(pNode u_, pNode v_, int w) : u(u_), v(v_), weight(w) {i = edge_cnt++;};
+  Edge(pNode u_, pNode v_, int w, int i_) : u(u_), v(v_), weight(w), i(i_) {};
   bool operator<(const Edge& r);
   void print();
 };

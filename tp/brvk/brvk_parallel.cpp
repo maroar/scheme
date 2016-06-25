@@ -12,32 +12,29 @@
 using namespace std;
 int num_threads, // total number of threads
       workspace, // amount of work to each thread
-      rest;      // rest of the work
+      rest,      // rest of the work
+      max_edges; // maximum number of edges
 vector<int> cheapest;
-mutex cheapest_mutex;
 
-struct task {
-  int begin, end, id;
-  Graph* G;
-
-  task(Graph* G_) : G(G_) {};
-
-  void operator()() {
-    for (int i = begin; i <= end; i++) {
-      pComponent set1 = G->E[i]->u->c->find_set();
-      pComponent set2 = G->E[i]->v->c->find_set();
+void work(int begin, int end, Graph *G) 
+{
+  for (int i = begin; i <= end; i++) {
+    for (auto& e : G->V[i]->adj) {
+      pComponent set1 = e->u->c->find_set();
+      pComponent set2 = e->v->c->find_set();
       if (set1 == set2) {
         continue;
       } else {
-        cheapest_mutex.lock();
-        if (cheapest[set1->id] == -1 || G->E[cheapest[set1->id]]->weight > G->E[i]->weight)
-          cheapest[set1->id] = i;
-        if (cheapest[set2->id] == -1 || G->E[cheapest[set2->id]]->weight > G->E[i]->weight)
-          cheapest[set2->id] = i;
-        cheapest_mutex.unlock();
+        if (cheapest[set1->id] == -1 || G->E[cheapest[set1->id]]->weight > e->weight) {
+          cheapest[set1->id] = e->i;
+        } 
       }
     }
   }
+}
+
+struct task {
+  int begin, end;
 };
 
 int main(int argc, char **argv) 
@@ -73,48 +70,29 @@ int main(int argc, char **argv)
   int tree_weight = 0; 
   // preparing parellel data
   vector<thread> threads;
-  int max_edges = m << 1;
+  max_edges = m << 1;
   num_threads = NUM_THREADS,
-  workspace = max_edges / NUM_THREADS,
-  rest = max_edges % NUM_THREADS;
+  workspace = n / NUM_THREADS,
+  rest = n % NUM_THREADS;
   if (rest) {
     num_threads++;
   }
-  vector<task> tsk(num_threads, task(&G));
+  vector<task> tsk(num_threads);
   for (int i = 0; i < num_threads; i++) {
-    tsk[i].id = i;
-    tsk[i].begin = workspace * i;
+    tsk[i].begin = workspace * i + 1;
     tsk[i].end = tsk[i].begin + workspace - 1;
   }
   if (rest)
     tsk[NUM_THREADS].end = tsk[NUM_THREADS].begin + rest -1;
-  
-  /*for (int i = 0; i < num_threads; i++) {
-    cout << "thread" << i << ":" << endl;
-    cout << "start:" << tsk[i].begin << " finish:" << tsk[i].end << endl;
-    cout << "--------------------------------- " << endl;
-  }*/
   while (size > 1) {
-    // traverse through all edges and update cheapest of every component
+    // each thread must traverse through all edges and update cheapest of every component
     for (int i = 0; i < num_threads; i++) {
-      threads.push_back(thread(tsk[i]));
+      threads.push_back(thread(work, tsk[i].begin, tsk[i].end, &G));
     }
     for (int i = 0; i < num_threads; i++) {
       threads[i].join();
     }
     threads.clear();
-    /*for (int i = 0; i < max_edges; i++) {
-      pComponent set1 = G.E[i]->u->c->find_set();
-      pComponent set2 = G.E[i]->v->c->find_set();
-      if (set1 == set2) {
-        continue;
-      } else {
-        if (cheapest[set1->id] == -1 || G.E[cheapest[set1->id]]->weight > G.E[i]->weight)
-          cheapest[set1->id] = i;
-        if (cheapest[set2->id] == -1 || G.E[cheapest[set2->id]]->weight > G.E[i]->weight)
-          cheapest[set2->id] = i;
-      }
-    }*/
     // Consider the above picked cheapest edges and add them to MST
     for (int i = 1; i <= n; i++) {
       if (cheapest[i] != -1) {

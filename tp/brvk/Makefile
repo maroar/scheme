@@ -4,7 +4,7 @@ all:
 p: 
 	g++ -std=c++11 -pthread brvk_parallel.cpp graph.cpp Component.cpp -o brvkp.exe
 
-pg:
+gp:
 	g++ -g -std=c++11 -pthread brvk_parallel.cpp graph.cpp Component.cpp -o brvkp.exe
 
 rp: 
